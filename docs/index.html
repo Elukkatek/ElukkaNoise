@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ElukkaNoise</title>
+  <meta name="description" content="ElukkaNoise — a free noise riser / fall / FX instrument plugin (VST3) for macOS, Windows and Linux.">
+  <style>
+    :root { --bg: #000000; --panel: #0c0c0c; --text: #f2f2f2; --muted: #9a9a9a; --accent: #ffffff; --border: #2a2a2a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    main { max-width: 640px; margin: 0 auto; padding: 64px 20px 48px; text-align: center; }
+    h1 { font-size: 44px; margin: 0 0 8px; letter-spacing: -0.5px; }
+    .tag { color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-size: 13px; }
+    p { color: var(--muted); margin: 16px 0; }
+    .shot { width: 100%; max-width: 600px; border: 1px solid var(--border); border-radius: 8px; margin: 28px auto 0; display: block; }
+    .buttons { display: flex; flex-direction: column; gap: 12px; margin: 36px 0 20px; }
+    .btn { display: block; padding: 16px 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 600; font-size: 18px; }
+    .btn small { display: block; color: var(--muted); font-weight: 400; font-size: 14px; margin-top: 2px; }
+    .btn:hover { border-color: var(--accent); }
+    .links a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border); }
+    .links a:hover { text-decoration-color: var(--accent); }
+    .fine { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="tag">Beta · v0.9.26</div>
+    <h1>ElukkaNoise</h1>
+    <p>A free noise riser, fall and FX instrument for techno, hard techno, industrial and psytrance.
+       Hold a note and automate the one MACRO knob: 0 to 100 % is a riser, 100 to 0 % a fall. Two filters,
+       LFOs, sample &amp; hold, a trance gate, a modulation matrix, compressor, delay and reverb, with
+       33 factory presets. VST3 instrument for macOS, Windows and Linux.</p>
+
+    <img class="shot" src="ui-main.png" alt="ElukkaNoise main window: the MACRO knob with the noise, movement, delay and reverb controls">
+
+    <div class="buttons">
+      <a class="btn" href="https://github.com/Elukkatek/ElukkaNoise/releases/download/v0.9.26/ElukkaNoise-v0.9.26-macOS-universal.zip">
+        Download for macOS <small>Universal (Apple Silicon + Intel), macOS 11+</small>
+      </a>
+      <a class="btn" href="https://github.com/Elukkatek/ElukkaNoise/releases/download/v0.9.26/ElukkaNoise-v0.9.26-Windows-x64.zip">
+        Download for Windows <small>64-bit, Windows 10 / 11</small>
+      </a>
+      <a class="btn" href="https://github.com/Elukkatek/ElukkaNoise/releases/download/v0.9.26/ElukkaNoise-v0.9.26-Linux-x64.zip">
+        Download for Linux <small>x86-64, glibc 2.35+ (Ubuntu 22.04 or newer)</small>
+      </a>
+    </div>
+
+    <p class="links">
+      <a href="https://github.com/Elukkatek/ElukkaNoise">Source code on GitHub</a> ·
+      <a href="https://github.com/Elukkatek/ElukkaNoise/releases/tag/v0.9.26">Release notes</a> ·
+      <a href="https://elukkatek.github.io/ElukkaSynth/">ElukkaSynth</a>
+    </p>
+    <p class="fine">Each download contains the plugin and a README with installation steps.
+       This is a beta: please report problems on GitHub. Free software under the AGPLv3.</p>
+  </main>
+</body>
+</html>
