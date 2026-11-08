@@ -83,4 +83,12 @@ if(ELUKKA_BUILD_TESTS)
         juce::juce_audio_utils
         juce::juce_dsp
         juce::juce_recommended_config_flags)
+    # The test's main() keeps many processors and buffers on the stack (one huge frame), more than the default
+    # main-thread stack on Windows (1 MB) and macOS (8 MB): 64 MB. Linux takes the main stack from `ulimit -s` (the CI
+    # raises it).
+    if(MSVC)
+        target_link_options(ElukkaNoiseTest PRIVATE /STACK:67108864)
+    elseif(APPLE)
+        target_link_options(ElukkaNoiseTest PRIVATE -Wl,-stack_size,0x4000000)
+    endif()
 endif()

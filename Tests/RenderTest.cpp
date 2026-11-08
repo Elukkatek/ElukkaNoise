@@ -1009,6 +1009,7 @@ static int runProbeFxKnobs (const juce::String& presetA, const juce::String& pre
 
 int main (int argc, char** argv)
 {
+    std::cout << std::unitbuf;   // unbuffered: a crash in CI still shows the last check that ran
     juce::ScopedJuceInitialiser_GUI init;
     if (argc > 1 && juce::String (argv[1]) == "--sweep") return runSweep (argc > 2 ? juce::String (argv[2]) : juce::String());
     if (argc > 1 && juce::String (argv[1]) == "--probe") return runProbe();
