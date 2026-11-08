@@ -3,6 +3,8 @@
 Noise riser / fall / FX instrument (VST3) for techno, hard techno, industrial and psytrance.
 Hold a MIDI note and automate the **MACRO** knob: 0 % to 100 % is a riser, 100 % to 0 % a fall.
 Built with JUCE 8.0.4 and CMake, same toolchain and conventions as ElukkaSynth. See `BUILDING.md`.
+Source and beta builds: https://github.com/Elukkatek/ElukkaNoise (GitHub Actions builds the Windows x64 and Linux x64
+VST3 on every push and attaches them to a release on a `v*` tag; the macOS universal build is made locally).
 Free software under the GNU Affero General Public License v3 (`LICENSE`); JUCE is used under the AGPLv3.
 
 ## How it is put together
@@ -574,7 +576,8 @@ restored; it is a deliberate workaround and only matters while the plugin window
   brightness, tails, clicks; the WAVs in `ListeningTests/` are the 0 -> 100 -> 0 % sweeps), Filter 2 and the v0.9.20
   effect presets (tune knob values and macro depths by ear), and for the v0.9.17 reverb (ducking, the bloom, the
   characters).
-- Windows and Linux builds (project is portable, same layout as ElukkaSynth's CI).
+- Windows and Linux builds have only been exercised by CI (compiled, loaded like a host, the 251-check suite
+  run); nobody has used them in a DAW yet.
 - The macOS build is not notarized (see `packaging/README-macos.txt`).
 
 ## Design decisions worth knowing
