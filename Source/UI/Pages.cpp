@@ -569,7 +569,7 @@ public:
         const float depth = proc.apvts.getParameter ("gate_depth")->convertFrom0to1 (proc.engine.uiDest[P::DGateDepth].load());
         const float duty = v ("gate_duty");
         // simulate two steps at 4 kHz with the engine's equations, draw the second (steady state)
-        constexpr double rate = 4000.0;
+        static constexpr double rate = 4000.0;   // static: MSVC will not let a lambda use a plain constexpr local
         const int n = juce::jmax (8, (int) (stepMs * 0.001 * rate));
         auto coef = [] (float ms) { return 1.0f - std::exp (-1.0f / (juce::jmax (0.1f, ms) * 0.001f * (float) rate)); };
         const float aA = coef (v ("gate_att")), dA = coef (v ("gate_decay")), rA = coef (v ("gate_rel")), sus = v ("gate_sus");
@@ -1083,7 +1083,7 @@ void EffectsPage::showFxMenu (FxPresetManager& m, juce::Component& target)
         menu.addItem (i + 1, e.name, true, i == m.currentIndex);
     }
     menu.addSeparator();
-    constexpr int saveId = 100000, deleteId = 100001;
+    static constexpr int saveId = 100000, deleteId = 100001;   // static: used inside the lambda (MSVC)
     menu.addItem (saveId, "Save as...");
     const bool isUser = m.currentIndex >= 0 && ! m.entries[(size_t) m.currentIndex].isFactory;
     menu.addItem (deleteId, "Delete \"" + m.currentName + "\"", isUser);

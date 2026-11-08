@@ -677,7 +677,7 @@ bool PresetManager::deletePreset (int entryIndex)
     if (entryIndex < 0 || entryIndex >= (int) entries.size()) return false;
     auto e = entries[(size_t) entryIndex];
     if (e.isFactory || ! e.file.existsAsFile()) return false;
-    if (! e.file.moveToTrash()) return false;
+    if (! e.file.moveToTrash() && ! e.file.deleteFile()) return false;   // no Trash (a bare Linux session): delete outright
     refresh();
     if (currentName == e.name && currentCategory == e.category) currentIndex = -1;
     proc.bumpUiVersion();
