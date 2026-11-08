@@ -1,0 +1,14 @@
+# build output
+build/
+build-*/
+cmake-build-*/
+dist/
+*.vst3
+*.zip
+
+# editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+ListeningTests/

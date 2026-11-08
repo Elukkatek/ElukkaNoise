@@ -1,0 +1,124 @@
+name: Build VST3 (Windows, Linux)
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: cmake -B build -G "Visual Studio 17 2022" -A x64 -DELUKKA_COPY_PLUGIN_AFTER_BUILD=OFF
+
+      - name: Build
+        run: cmake --build build --config Release --target ElukkaNoise_VST3 ElukkaNoiseTest --parallel
+
+      - name: Check architecture and bundle layout
+        shell: pwsh
+        run: |
+          $dll = "build/ElukkaNoise_artefacts/Release/VST3/ElukkaNoise.vst3/Contents/x86_64-win/ElukkaNoise.vst3"
+          if (!(Test-Path $dll)) { throw "VST3 binary missing: $dll" }
+          $bytes = [IO.File]::ReadAllBytes($dll)
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          if ($machine -ne 0x8664) { throw ("Not an x64 binary (machine = 0x{0:X})" -f $machine) }
+          "x64 PE confirmed"
+          Get-ChildItem -Recurse "build/ElukkaNoise_artefacts/Release/VST3/ElukkaNoise.vst3" | Select-Object FullName
+
+      - name: Package
+        shell: bash
+        run: scripts/package.sh windows build/ElukkaNoise_artefacts/Release/VST3/ElukkaNoise.vst3 dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ElukkaNoise-Windows-x64
+          path: dist/*.zip
+          if-no-files-found: error
+
+      - name: Load the built VST3 like a host would
+        shell: bash
+        run: build/ElukkaNoiseTest_artefacts/Release/ElukkaNoiseTest.exe --host build/ElukkaNoise_artefacts/Release/VST3/ElukkaNoise.vst3
+
+      - name: Run offline test suite
+        shell: bash
+        run: |
+          set +e
+          build/ElukkaNoiseTest_artefacts/Release/ElukkaNoiseTest.exe
+          code=$?
+          echo "ElukkaNoiseTest exit code: $code"
+          exit $code
+
+  linux:
+    name: Linux x64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake pkg-config zip xvfb \
+            libasound2-dev libfreetype-dev libfontconfig1-dev \
+            libx11-dev libxext-dev libxrandr-dev libxinerama-dev libxcursor-dev \
+            libgl1-mesa-dev
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DELUKKA_COPY_PLUGIN_AFTER_BUILD=OFF
+
+      - name: Build
+        run: cmake --build build --target ElukkaNoise_VST3 ElukkaNoiseTest --parallel
+
+      - name: Check architecture, bundle layout and dynamic dependencies
+        run: |
+          so=build/ElukkaNoise_artefacts/Release/VST3/ElukkaNoise.vst3/Contents/x86_64-linux/ElukkaNoise.so
+          test -f "$so"
+          file "$so" | tee /dev/stderr | grep -q "x86-64"
+          find build/ElukkaNoise_artefacts/Release/VST3/ElukkaNoise.vst3 -type f
+          echo "--- shared library dependencies ---"
+          ldd "$so"
+          echo "--- highest glibc symbol version required ---"
+          objdump -T "$so" | grep -o 'GLIBC_[0-9.]*' | sort -t. -k2,2n -k3,3n -u | tail -1
+
+      - name: Package
+        run: scripts/package.sh linux build/ElukkaNoise_artefacts/Release/VST3/ElukkaNoise.vst3 dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ElukkaNoise-Linux-x64
+          path: dist/*.zip
+          if-no-files-found: error
+
+      - name: Load the built VST3 like a host would
+        run: xvfb-run -a build/ElukkaNoiseTest_artefacts/Release/ElukkaNoiseTest --host build/ElukkaNoise_artefacts/Release/VST3/ElukkaNoise.vst3
+
+      - name: Run offline test suite
+        run: ulimit -s 65536 && xvfb-run -a build/ElukkaNoiseTest_artefacts/Release/ElukkaNoiseTest
+
+  release:
+    name: GitHub release (tags only)
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, linux]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create release and attach ZIPs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" dist/*.zip --repo "${GITHUB_REPOSITORY}" --title "ElukkaNoise ${GITHUB_REF_NAME}" --prerelease --notes "Beta build. Windows x64 and Linux x64 VST3 attached by CI; the macOS universal VST3 is built locally and uploaded separately. Each ZIP contains a README with installation steps."
